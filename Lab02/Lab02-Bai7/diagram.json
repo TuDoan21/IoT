@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "author": "Doan Tuan Tu",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp32",
+      "top": 120,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": 20,
+      "left": 220,
+      "attrs": {
+        "temperature": "32",
+        "humidity": "50"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 220,
+      "left": 220,
+      "attrs": {
+        "volume": "0.1"
+      }
+    }
+  ],
+  "connections": [
+    ["esp32:3V3", "dht1:VCC", "red", ["v0"]],
+    ["esp32:GND.1", "dht1:GND", "black", ["v0"]],
+    ["esp32:D4", "dht1:SDA", "green", ["v0"]],
+
+    ["esp32:D15", "bz1:1", "orange", ["v0"]],
+    ["esp32:GND.2", "bz1:2", "black", ["v0"]]
+  ],
+  "dependencies": {}
+}

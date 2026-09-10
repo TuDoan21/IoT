@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "author": "Đoàn Tuấn Tú",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "red",
+      "top": -70,
+      "left": 220,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "yellow",
+      "top": 0,
+      "left": 220,
+      "attrs": { "color": "yellow" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "green",
+      "top": 70,
+      "left": 220,
+      "attrs": { "color": "green" }
+    }
+  ],
+  "connections": [
+    ["esp:23", "red:A", "green"],
+    ["red:C", "esp:GND.1", "black"],
+    ["esp:22", "yellow:A", "green"],
+    ["yellow:C", "esp:GND.1", "black"],
+    ["esp:21", "green:A", "green"],
+    ["green:C", "esp:GND.1", "black"]
+  ]
+}
