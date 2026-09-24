@@ -1,0 +1,4 @@
+# Thư viện sử dụng cho Wokwi ESP32 Simulation
+DHT sensor library
+Adafruit Unified Sensor
+ArduinoJson

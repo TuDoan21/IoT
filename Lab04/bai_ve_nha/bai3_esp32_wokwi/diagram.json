@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "author": "Sinh vien IoT Lab 04",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -90,
+      "left": 160,
+      "attrs": { "temperature": "28.5", "humidity": "65" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v-20", "h-110" ] ],
+    [ "dht1:GND", "esp:GND.1", "black", [ "v-10", "h-130" ] ],
+    [ "dht1:SDA", "esp:15", "green", [ "v20", "h-150" ] ]
+  ],
+  "dependencies": {}
+}

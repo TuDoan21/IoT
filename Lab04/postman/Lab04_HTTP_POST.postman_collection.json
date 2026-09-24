@@ -1,0 +1,579 @@
+{
+	"info": {
+		"_postman_id": "8f2e9c14-3a5d-4882-9861-df782e4e7601",
+		"name": "Lab04 HTTP POST và IoT Sensor",
+		"description": "Collection cho Lab04 môn Internet of Things (IoT) - Giao thức HTTP POST, Dữ liệu Cảm biến, Xác thực, Xử lý lỗi và Flask Local Server.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 HTTP POST cơ bản",
+			"item": [
+				{
+					"name": "POST dữ liệu cảm biến đơn giản",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 2xx success\", function () {",
+									"    pm.response.to.be.success;",
+									"});",
+									"",
+									"pm.test(\"Response time is under 5000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test(\"Response body is present\", function () {",
+									"    pm.expect(pm.response.text()).to.not.be.undefined;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"sensor_01\",\n  \"temperature\": 25.5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{webhook_url}}",
+							"host": [
+								"{{webhook_url}}"
+							]
+						},
+						"description": "Gửi dữ liệu nhiệt độ đơn giản từ thiết bị sensor_01 tới Webhook.site."
+					},
+					"response": []
+				}
+			],
+			"description": "Thực hành gửi HTTP POST cơ bản với Content-Type application/json."
+		},
+		{
+			"name": "02 JSON cảm biến nâng cao",
+			"item": [
+				{
+					"name": "POST dữ liệu cảm biến đầy đủ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 2xx success\", function () {",
+									"    pm.response.to.be.success;",
+									"});",
+									"",
+									"pm.test(\"Response time is under 5000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test(\"Response body exists\", function () {",
+									"    pm.expect(pm.response.text()).to.not.be.undefined;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"timestamp\": \"{{$isoTimestamp}}\",\n  \"node_id\": \"node_esp32_{{$randomInt}}\",\n  \"sensors\": {\n    \"temperature\": 28.5,\n    \"humidity\": 65.2,\n    \"light_intensity\": {{$randomInt}}\n  },\n  \"battery_level\": 95\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{webhook_url}}",
+							"host": [
+								"{{webhook_url}}"
+							]
+						},
+						"description": "Gửi gói tin cảm biến đầy đủ với JSON lồng nhau và các biến động Postman ($isoTimestamp, $randomInt)."
+					},
+					"response": []
+				}
+			],
+			"description": "Cấu trúc JSON cảm biến nâng cao với object lồng nhau và biến động."
+		},
+		{
+			"name": "03 Authentication",
+			"item": [
+				{
+					"name": "POST với API Key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 2xx success\", function () {",
+									"    pm.response.to.be.success;",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"sensor_secure_01\",\n  \"temperature\": 26.2,\n  \"auth_type\": \"api_key\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{webhook_url}}",
+							"host": [
+								"{{webhook_url}}"
+							]
+						},
+						"description": "Gửi HTTP POST kèm custom header X-API-Key để xác thực thiết bị."
+					},
+					"response": []
+				},
+				{
+					"name": "POST với Bearer Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 2xx success\", function () {",
+									"    pm.response.to.be.success;",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"sensor_secure_02\",\n  \"temperature\": 27.0,\n  \"auth_type\": \"bearer_token\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{webhook_url}}",
+							"host": [
+								"{{webhook_url}}"
+							]
+						},
+						"description": "Gửi HTTP POST kèm tiêu chuẩn xác thực Authorization: Bearer token."
+					},
+					"response": []
+				},
+				{
+					"name": "POST kết hợp API Key và Bearer Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 2xx success\", function () {",
+									"    pm.response.to.be.success;",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"sensor_secure_dual\",\n  \"temperature\": 26.8,\n  \"auth_type\": \"dual_auth\",\n  \"timestamp\": \"{{$isoTimestamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{webhook_url}}",
+							"host": [
+								"{{webhook_url}}"
+							]
+						},
+						"description": "Gửi đồng thời cả X-API-Key và Bearer Token để kiểm tra và quan sát bảng Headers trên Webhook.site."
+					},
+					"response": []
+				}
+			],
+			"description": "Các kỹ thuật xác thực phổ biến trong IoT API (API Key và Bearer Token)."
+		},
+		{
+			"name": "04 Timeout và kiểm tra lỗi",
+			"item": [
+				{
+					"name": "POST hợp lệ kiểm tra Webhook",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 2xx success\", function () {",
+									"    pm.response.to.be.success;",
+									"});",
+									"",
+									"pm.test(\"Response time is under 5000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"sensor_test_valid\",\n  \"temperature\": 24.0,\n  \"status\": \"normal\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{webhook_url}}",
+							"host": [
+								"{{webhook_url}}"
+							]
+						},
+						"description": "Request hợp lệ gửi tới Webhook để làm đối chứng."
+					},
+					"response": []
+				},
+				{
+					"name": "POST URL lỗi mô phỏng mất kết nối (Chỉ kiểm thử ngoại lệ)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Request này được cố tình cấu hình tới IP/Port không hoạt động",
+									"// để kiểm thử ngoại lệ kết nối (Connection Error / Timeout).",
+									"// Postman sẽ hiển thị Could not get response (Connection refused/timeout).",
+									"pm.test(\"Connection failure expected\", function () {",
+									"    // Nếu có phản hồi bất ngờ từ gateway mạng thì kiểm tra không phải 200",
+									"    if (pm.response) {",
+									"        pm.expect(pm.response.code).to.not.eql(200);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"sensor_error_node\",\n  \"temperature\": 99.9,\n  \"note\": \"Request lỗi chỉ phục vụ kiểm thử ngoại lệ kết nối\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.255.255.1:59999/api/nonexistent",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"1"
+							],
+							"port": "59999",
+							"path": [
+								"api",
+								"nonexistent"
+							]
+						},
+						"description": "LƯU Ý: Request này CHỈ PHỤC VỤ KIỂM THỬ NGOẠI LỆ. URL trỏ tới địa chỉ không tồn tại (10.255.255.1:59999) nhằm minh họa phản ứng khi client gặp lỗi kết nối hoặc rớt mạng."
+					},
+					"response": []
+				}
+			],
+			"description": "Thử nghiệm kịch bản kết nối bình thường và kiểm thử ngoại lệ mạng/timeout."
+		},
+		{
+			"name": "05 Flask Local Server",
+			"item": [
+				{
+					"name": "GET kiểm tra trạng thái Server (Health Check)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Server status is healthy\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"healthy\");",
+									"});",
+									"",
+									"pm.test(\"Response contains message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local_server_url}}/health",
+							"host": [
+								"{{local_server_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Kiểm tra xem Flask Server cục bộ đã sẵn sàng tiếp nhận request hay chưa."
+					},
+					"response": []
+				},
+				{
+					"name": "POST dữ liệu cảm biến tới Local Server (Hợp lệ - HTTP 200)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Status is success\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"});",
+									"",
+									"pm.test(\"Response contains message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"Response time is under 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"sensor_local_01\",\n  \"timestamp\": \"{{$isoTimestamp}}\",\n  \"temperature\": 28.5,\n  \"humidity\": 72.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local_server_url}}/api/sensor",
+							"host": [
+								"{{local_server_url}}"
+							],
+							"path": [
+								"api",
+								"sensor"
+							]
+						},
+						"description": "Gửi dữ liệu cảm biến hợp lệ tới Flask Local Server. Kỳ vọng nhận HTTP 200 OK với status success."
+					},
+					"response": []
+				},
+				{
+					"name": "POST dữ liệu thiếu trường (Kiểm tra HTTP 400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response is JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Status is error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"error\");",
+									"});",
+									"",
+									"pm.test(\"Response contains message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"temperature\": 28.5,\n  \"humidity\": 72.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local_server_url}}/api/sensor",
+							"host": [
+								"{{local_server_url}}"
+							],
+							"path": [
+								"api",
+								"sensor"
+							]
+						},
+						"description": "Cố tình gửi thiếu trường 'device_id' để kiểm tra xem Server có validate dữ liệu và trả về lỗi HTTP 400 Bad Request hay không."
+					},
+					"response": []
+				}
+			],
+			"description": "Các request kiểm thử gửi tới Flask Local Server (Bài về nhà 2)."
+		}
+	]
+}

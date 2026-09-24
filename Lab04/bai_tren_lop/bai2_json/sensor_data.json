@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-09-17T14:30:00Z",
+  "node_id": "esp32_sensor_node_01",
+  "sensors": {
+    "temperature": 28.75,
+    "humidity": 68.2,
+    "light_intensity": 520
+  },
+  "battery_level": 94.5
+}

@@ -1,0 +1,149 @@
+###############################################################################
+# LAB 04: HTTP POST & IOT SENSOR - REST CLIENT REQUESTS
+# Dùng để gửi trực tiếp trong VS Code bằng extension "REST Client"
+###############################################################################
+
+# =============================================================================
+# CÁC BIẾN CẤU HÌNH (ENVIRONMENT VARIABLES)
+# =============================================================================
+@webhookUrl = https://webhook.site/7e245820-4dfb-425a-a195-59e69a15b129
+@localServerUrl = http://127.0.0.1:5000
+@apiKey = my_secret_key_123
+@bearerToken = token_xyz
+
+###############################################################################
+# THƯ MỤC 01: HTTP POST CƠ BẢN
+###############################################################################
+
+### 01.1 - Gửi dữ liệu cảm biến đơn giản
+# Mục đích: Thực hành gửi HTTP POST cơ bản lên Webhook.site với Content-Type JSON.
+POST {{webhookUrl}}
+Content-Type: application/json
+
+{
+  "device_id": "sensor_01",
+  "temperature": 25.5
+}
+
+
+###############################################################################
+# THƯ MỤC 02: JSON CẢM BIẾN NÂNG CAO
+###############################################################################
+
+### 02.1 - Gửi gói tin cảm biến đầy đủ (Object lồng nhau)
+# Mục đích: Gửi cấu trúc JSON phức tạp gồm timestamp, node_id, sensors và battery_level.
+POST {{webhookUrl}}
+Content-Type: application/json
+
+{
+  "timestamp": "2026-09-17T14:30:00Z",
+  "node_id": "node_esp32_01",
+  "sensors": {
+    "temperature": 28.5,
+    "humidity": 65.2,
+    "light_intensity": 520
+  },
+  "battery_level": 95
+}
+
+
+###############################################################################
+# THƯ MỤC 03: AUTHENTICATION
+###############################################################################
+
+### 03.1 - Gửi HTTP POST với API Key (Header X-API-Key)
+# Mục đích: Xác thực thiết bị qua Custom Header X-API-Key.
+POST {{webhookUrl}}
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "device_id": "sensor_secure_01",
+  "temperature": 26.2,
+  "auth_type": "api_key"
+}
+
+### 03.2 - Gửi HTTP POST với Bearer Token (Header Authorization)
+# Mục đích: Xác thực thiết bị qua chuẩn Authorization: Bearer.
+POST {{webhookUrl}}
+Content-Type: application/json
+Authorization: Bearer {{bearerToken}}
+
+{
+  "device_id": "sensor_secure_02",
+  "temperature": 27.0,
+  "auth_type": "bearer_token"
+}
+
+### 03.3 - Gửi HTTP POST kết hợp cả API Key và Bearer Token
+# Mục đích: Quan sát đồng thời cả hai header xác thực trên Webhook.site.
+POST {{webhookUrl}}
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+Authorization: Bearer {{bearerToken}}
+
+{
+  "device_id": "sensor_secure_dual",
+  "temperature": 26.8,
+  "auth_type": "dual_auth"
+}
+
+
+###############################################################################
+# THƯ MỤC 04: TIMEOUT VÀ KIỂM TRA LỖI
+###############################################################################
+
+### 04.1 - Request hợp lệ tới Webhook.site (Đối chứng)
+# Mục đích: Gửi request bình thường để làm cơ sở so sánh với request lỗi.
+POST {{webhookUrl}}
+Content-Type: application/json
+
+{
+  "device_id": "sensor_test_valid",
+  "temperature": 24.0,
+  "status": "normal"
+}
+
+### 04.2 - Request URL không tồn tại (Chỉ kiểm thử ngoại lệ kết nối)
+# LƯU Ý: Request này cố tình trỏ vào host không hoạt động để kiểm tra khả năng xử lý lỗi.
+POST http://10.255.255.1:59999/api/sensor
+Content-Type: application/json
+
+{
+  "device_id": "sensor_error_node",
+  "temperature": 99.9,
+  "note": "Request kiểm thử ngoại lệ rớt mạng hoặc sai host"
+}
+
+
+###############################################################################
+# THƯ MỤC 05: FLASK LOCAL SERVER
+# Lưu ý: Cần khởi động server trước bằng lệnh:
+# python bai_ve_nha/bai2_flask_server/server.py
+###############################################################################
+
+### 05.1 - GET Kiểm tra trạng thái Flask Server (Health Check)
+# Mục đích: Xác nhận Flask Server đã sẵn sàng nhận kết nối.
+GET {{localServerUrl}}/health
+
+### 05.2 - POST Dữ liệu cảm biến hợp lệ tới Flask Server (Kỳ vọng HTTP 200 OK)
+# Mục đích: Gửi dữ liệu hợp lệ và nhận phản hồi success từ Server.
+POST {{localServerUrl}}/api/sensor
+Content-Type: application/json
+
+{
+  "device_id": "sensor_local_01",
+  "timestamp": "2026-09-17T14:30:00Z",
+  "temperature": 28.5,
+  "humidity": 72.0
+}
+
+### 05.3 - POST Dữ liệu thiếu trường bắt buộc (Kỳ vọng HTTP 400 Bad Request)
+# Mục đích: Cố tình thiếu trường "device_id" để kiểm tra tính năng validation của Server.
+POST {{localServerUrl}}/api/sensor
+Content-Type: application/json
+
+{
+  "temperature": 28.5,
+  "humidity": 72.0
+}
